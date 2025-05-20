@@ -28,7 +28,7 @@ export default function Component() {
   const fetchSavedAddresses = async () => {
     try {
       showToast(`读取本地配置`)
-      const response = await fetch('http://localhost:1198/api/model/config')
+      const response = await fetch('http://localhost:8080/api/model/config')
       if (response.ok) {
         const data = await response.json()
         setAddress0(data.url || '')
@@ -51,7 +51,7 @@ export default function Component() {
   const saveAddress = async (key: 'url' | 'apikey' | 'model' | 'address2' | 'address3' | 'comfyuiNodeApi', value: string) => {
     setSavingStates(prev => ({ ...prev, [key]: true }))
     try {
-      const response = await fetch('http://localhost:1198/api/model/config', {
+      const response = await fetch('http://localhost:8080/api/model/config', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ export default function Component() {
 
   const saveAddress3Type = async (value: string) => {
     try {
-      const response = await fetch('http://localhost:1198/api/model/config', {
+      const response = await fetch('http://localhost:8080/api/model/config', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

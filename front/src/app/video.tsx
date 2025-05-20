@@ -13,7 +13,7 @@ export default function VideoGenerator() {
 
   const fetchInitialVideo = async () => {
     try {
-      const response = await fetch('http://localhost:1198/api/novel/video', {
+      const response = await fetch('http://localhost:8080/api/novel/video', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -26,7 +26,7 @@ export default function VideoGenerator() {
 
       const data = await response.json()
       if (data.videoUrl) {
-        setVideoUrl(`http://localhost:1198${data.videoUrl}`)
+        setVideoUrl(`http://localhost:8080${data.videoUrl}`)
       }
     } catch (err) {
       console.error('Error fetching initial video:', err)
@@ -38,7 +38,7 @@ export default function VideoGenerator() {
     setError(null)
 
     try {
-      const response = await fetch('http://localhost:1198/api/novel/video', {
+      const response = await fetch('http://localhost:8080/api/novel/video', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

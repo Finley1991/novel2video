@@ -18,8 +18,8 @@ export default function CharacterExtractor() {
         setIsLoading(true)
         try {
             const endpoint = isLocal
-                ? 'http://localhost:1198/api/novel/characters/local'
-                : 'http://localhost:1198/api/novel/characters'
+                ? 'http://localhost:8080/api/novel/characters/local'
+                : 'http://localhost:8080/api/novel/characters'
             const response = await fetch(endpoint)
             const data = await response.json()
             if (response.status == 40401) {
@@ -45,7 +45,7 @@ export default function CharacterExtractor() {
 
     const generateRandomDescription = async (roleName: string) => {
         try {
-            const response = await fetch('http://localhost:1198/api/novel/characters/random')
+            const response = await fetch('http://localhost:8080/api/novel/characters/random')
             const randomDescription = await response.json()
             setEditedDescriptions(prev => ({
                 ...prev,
@@ -61,7 +61,7 @@ export default function CharacterExtractor() {
     const saveChanges = async () => {
         setIsLoading(true)
         try {
-            await fetch('http://localhost:1198/api/novel/characters', {
+            await fetch('http://localhost:8080/api/novel/characters', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

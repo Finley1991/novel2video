@@ -33,7 +33,7 @@ npm install toastify-js --registry=https://registry.npmmirror.com
 ## 运行
 cd front
 npm run dev
-```
+``
 
 ## 使用说明
 以comfyui为例 <br>

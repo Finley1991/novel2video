@@ -15,7 +15,7 @@ export default function TextEditor() {
 
   const loadContent = async (type: 'novel' | 'prompt') => {
     try {
-      const response = await fetch(`http://localhost:1198/api/${type}/load`)
+      const response = await fetch(`http://localhost:8080/api/${type}/load`)
       if (response.ok) {
         const data = await response.json()
         if (data.content) {
@@ -36,7 +36,7 @@ export default function TextEditor() {
   const handleSave = async (type: 'novel' | 'prompt') => {
     try {
       const content = type === 'novel' ? novelContent : promptContent
-      const response = await fetch(`http://localhost:1198/api/${type}/save`, {
+      const response = await fetch(`http://localhost:8080/api/${type}/save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

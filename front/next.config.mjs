@@ -5,7 +5,7 @@ const nextConfig = {
             {
                 protocol: 'http',
                 hostname: 'localhost',
-                port: '1198',
+                port: '8080',
                 pathname: '/images/**',
             },
         ],
