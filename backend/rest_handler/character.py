@@ -6,22 +6,20 @@ import shutil
 from flask import Flask, request, jsonify
 
 from backend.llm.llm import query_llm
-from backend.util.constant import character_dir, prompts_dir, novel_fragments_dir
+from backend.util.constant import character_dir, novel_fragments_dir, EXTRACT_CHARACTER_SYS, APPEARANCE_PROMPT
 
-extract_character_sys = """
-	#Task: #
-	Extract characters from the novel fragment
-	
-	#Rule#
-	1. 提取出所有出现过的角色
-	2. 所有的人名，别名，称呼，包括对话中引用到的名字都需要提取
-    3. 所有出现过的和人有关的称呼都需要提取
-    4. 如果文本以第一人称或者第二人称叙述，我/你这种人称代词也需要提取
-	5. 如果一个人出现过不止一种称呼，则都提取
-	
-	#Output Format:#
-	名字1/名字2/名字3/...
-"""
+# extract_character_sys = """
+# 	# Task
+# 	从我提供的小说文本中提取出角色名称
+# 	
+# 	# Rule
+# 	1. 提取出所有出现过的角色名字，包含主角和配角
+# 	2. 可以提取人称代词
+# 	3. 不要输出人名、人称代词以外的任何内容
+# 	
+# 	#Output Format:#
+# 	角色1/角色2/角色3/角色4/角色5
+# """ # Removed this local variable definition
 
 def get_new_characters():
     try:
@@ -41,7 +39,9 @@ def get_new_characters():
         for i in range(0, len(lines), 500):
             end = min(i + 500, len(lines))
             prompt = ''.join(lines[i:end])
-            response = query_llm(prompt, extract_character_sys, "doubao", 0.01, 8192)
+            print("输入文本：", prompt, "\n", EXTRACT_CHARACTER_SYS)
+            response = query_llm(prompt, EXTRACT_CHARACTER_SYS, "gpt-3.5-turbo", 0.01, 8192)
+            print("角色：", response)
             for character in response.split('/'):
                 character_map[character.strip()] = character.strip()
 
@@ -79,7 +79,7 @@ def put_characters():
         character_map.update(descriptions)
         # Save descriptions to a file
         with open(os.path.join(character_dir, 'characters.txt'), 'w', encoding='utf-8') as file:
-            json.dump(character_map, file)
+            json.dump(character_map, file, ensure_ascii=False, indent=4)
 
         return jsonify({"message": "Descriptions updated successfully"}), 200
 
@@ -87,22 +87,22 @@ def put_characters():
         logging.error(f"Failed to put characters: {e}")
         return jsonify({"error": "Failed to put characters"}), 500
 
-appearance_prompt = """
-    随机生成动漫角色的外形描述，输出简练，以一组描述词的形式输出，每个描述用逗号隔开
-    数量：一个
-    包含：衣着，眼睛，发色，发型等等。
-    生成男性和女性的概率都为50%
-    根据生成的年龄和性别, 输出时在最前方标明1girl/1man/1boy/1lady等等
-    示例1: 1boy, white school uniform, brown eyes, short messy black hair.
-    示例2: 1girl, short skirt, skinny, blue eyes, blonde hair, twin tails, knee-high socks
-    示例3: 1man, Navy suit, Green eyes, short, slicked-back blonde hair
-    示例4: 1elderly man, Grey cardigan, Grey eyes, balding with white hair
-    使用英文输出，不要输出额外内容
-"""
+# appearance_prompt = """
+#     随机生成动漫角色的外形描述，输出简练，以一组描述词的形式输出，每个描述用逗号隔开
+#     数量：一个
+#     包含：衣着，眼睛，发色，发型等等。
+#     生成男性和女性的概率都为50%
+#     根据生成的年龄和性别, 输出时在最前方标明1girl/1man/1boy/1lady等等
+#     示例1: 1boy, white school uniform, brown eyes, short messy black hair.
+#     示例2: 1girl, short skirt, skinny, blue eyes, blonde hair, twin tails, knee-high socks
+#     示例3: 1man, Navy suit, Green eyes, short, slicked-back blonde hair
+#     示例4: 1elderly man, Grey cardigan, Grey eyes, balding with white hair
+#     使用英文输出，不要输出额外内容
+# """ # Removed this local variable definition
 
 def get_random_appearance():
     try:
-        prompt = appearance_prompt
+        prompt = APPEARANCE_PROMPT
         appearance = query_llm(prompt, "", "doubao", 1, 100)
         return jsonify(appearance), 200
     except Exception as e:

@@ -6,10 +6,10 @@ import re
 import concurrent.futures
 import logging
 from backend.llm.llm import llm_translate, query_llm
-from backend.util.constant import character_dir, novel_fragments_dir, prompts_dir, prompts_en_dir, prompt_path
-from backend.util.file import read_lines_from_directory, save_list_to_files, read_file
+from backend.util.constant import character_dir, novel_fragments_dir, prompts_dir, prompts_en_dir, prompt_path, FRAGMENTS_PER_LLM_CALL
+from backend.util.file import read_lines_from_directory, save_list_to_files, read_file, save_text_to_file
 
-fragmentsLen = 30
+# fragmentsLen = 30 # Removed this line
 
 # Function to generate input prompts
 def generate_input_prompts(lines, step):
@@ -46,7 +46,7 @@ def extract_scene_from_texts():
     except Exception as e:
         return jsonify({"error": "Failed to manage directory"}), 500
 
-    prompts_mid = generate_input_prompts(lines, fragmentsLen)
+    prompts_mid = generate_input_prompts(lines, FRAGMENTS_PER_LLM_CALL)
     offset = 0
     sys = read_file(prompt_path)
     for p in prompts_mid:
@@ -143,3 +143,68 @@ def save_prompt_zh():
         return jsonify({"error": "Failed to write file"}), 500
 
     return jsonify({"message": "Attachment saved successfully"}), 200
+
+
+def extract_single_scene_from_text():
+    req_data = request.get_json()
+    if not req_data or 'text' not in req_data or 'index' not in req_data:
+        return jsonify({"error": "Invalid request data. 'text' and 'index' are required."}), 400
+
+    input_text = req_data['text']
+    index = req_data['index']
+
+    try:
+        sys_prompt_content = read_file(prompt_path)
+        if not sys_prompt_content:
+            return jsonify({"error": "Failed to read system prompt file"}), 500
+
+        # 构建单行输入给LLM，模仿 generate_input_prompts 的单项输入
+        # 这里我们假设LLM可以直接处理单行文本进行场景提取
+        # 如果需要特定格式，例如 "0. text_content"，则需要相应调整
+        # formatted_input_text = f"{index}. {input_text}" # 根据LLM的需要调整
+        
+        # 使用 query_llm 生成中文 prompt
+        # 注意：这里的 "x" model_name 和 temperature, max_tokens 可能需要根据实际配置调整
+        # 这里的 model_name="x" 是基于 extract_scene_from_texts 中的用法，可能需要一个更合适的模型名称
+        chinese_prompt = query_llm(input_text, sys_prompt_content, "x", 1, 8192) 
+        
+        # 移除可能存在的序号前缀，例如 "0. "
+        re_pattern = re.compile(r'^\d+\.\s*')
+        cleaned_prompt = re_pattern.sub('', chinese_prompt).strip()
+
+        if not cleaned_prompt:
+             cleaned_prompt = input_text # 如果提取失败，使用原始输入
+
+        # 保存生成的中文 prompt
+        file_path = os.path.join(prompts_dir, f"{index}.txt")
+        save_text_to_file(cleaned_prompt, file_path)
+        
+        logging.info(f"Successfully extracted single Chinese prompt for index {index}: {cleaned_prompt}")
+        return jsonify({"prompt": cleaned_prompt, "index": index}), 200
+
+    except Exception as e:
+        logging.error(f"Failed to extract single scene: {e}")
+        return jsonify({"error": f"Failed to extract single scene: {str(e)}"}), 500
+
+def translate_single_prompt_en():
+    req_data = request.get_json()
+    if not req_data or 'text' not in req_data or 'index' not in req_data:
+        return jsonify({"error": "Invalid request data. 'text' and 'index' are required."}), 400
+
+    chinese_prompt = req_data['text']
+    index = req_data['index']
+
+    try:
+        # 翻译中文 prompt 到英文
+        english_prompt = llm_translate(chinese_prompt)
+
+        # 保存翻译后的英文 prompt
+        file_path = os.path.join(prompts_en_dir, f"{index}.txt")
+        save_text_to_file(english_prompt, file_path)
+
+        logging.info(f"Successfully translated single prompt to English for index {index}: {english_prompt}")
+        return jsonify({"prompt_en": english_prompt, "index": index}), 200
+
+    except Exception as e:
+        logging.error(f"Failed to translate single prompt to English: {e}")
+        return jsonify({"error": f"Failed to translate single prompt to English: {str(e)}"}), 500

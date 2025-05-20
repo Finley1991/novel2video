@@ -7,9 +7,10 @@ from backend.rest_handler.character import get_local_characters, get_new_charact
 from backend.rest_handler.image import generate_images, get_local_images, generate_single_image
 from backend.rest_handler.init import get_initial, get_novel_fragments, load_novel, save_combined_fragments, save_novel, \
     save_prompt, load_prompt, get_model_config, save_model_config
-from backend.rest_handler.prompt import extract_scene_from_texts, get_prompts_en, save_prompt_en, save_prompt_zh
+from backend.rest_handler.prompt import extract_scene_from_texts, get_prompts_en, save_prompt_en, save_prompt_zh, \
+    extract_single_scene_from_text, translate_single_prompt_en
 from backend.rest_handler.video import generate_video, get_video
-from backend.tts.tts import generate_audio_files
+from backend.tts.tts import generate_audio_files, generate_single_audio_file
 from backend.util.constant import image_dir, video_dir
 
 app = Flask(__name__)
@@ -47,6 +48,14 @@ def api_save_prompt_en():
 def api_save_prompt_zh():
     return save_prompt_zh()
 
+@app.route('/api/novel/prompt/zh/single', methods=['POST']) # 单独生成中文prompt
+def api_extract_single_scene_from_text_handler():
+    return extract_single_scene_from_text()
+
+@app.route('/api/novel/prompt/en/single', methods=['POST']) # 单独翻译英文prompt
+def api_translate_single_prompt_en_handler():
+    return translate_single_prompt_en()
+
 # image
 @app.route('/api/novel/images', methods=['POST']) # 一键生成
 def api_generate_image():
@@ -66,9 +75,13 @@ def api_get_initial():
     return get_initial()
 
 # tts
-@app.route('/api/novel/audio', methods=['POST']) # 生成音频
+@app.route('/api/novel/audio', methods=['POST']) # 生成音频(批量)
 def api_generate_audio_files():
     return generate_audio_files()
+
+@app.route('/api/novel/audio/single', methods=['POST']) # 单独生成音频
+def api_generate_single_audio_file_handler():
+    return generate_single_audio_file()
 
 # character
 @app.route('/api/novel/characters', methods=['GET']) # 生成新角色
@@ -141,4 +154,4 @@ def serve_images(filename):
 
 if __name__ == '__main__':
     logging.info(f"Current working directory:{os.getcwd()}")
-    app.run(host='localhost', port=1198)
+    app.run(host='localhost', port=8080)

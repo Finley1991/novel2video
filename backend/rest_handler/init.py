@@ -148,6 +148,7 @@ def save_prompt():
         return jsonify({'error': str(e)}), 500
 
 def get_model_config():
+    logging.info(f'Config path: {config_path}')
     if not os.path.exists(config_path) or os.path.getsize(config_path) == 0:
         with open(config_path, 'w', encoding='utf-8') as file:
             json.dump({'model':'', 'url':'', 'apikey': '', 'address2': '', 'address3': ''}, file)

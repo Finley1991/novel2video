@@ -2,8 +2,7 @@ import logging
 import requests
 
 from backend.util.file import get_config
-
-LLAMA_405B = "Meta-Llama-3.1-405B-Instruct"
+# from backend.util.constant import LLAMA_405B
 
 def query_samba_nova(input_text: str, sys: str, model_name: str, temperature: float) -> str:
     model = get_config()['model']

@@ -5,28 +5,34 @@ import os
 import requests
 import base64
 
-from backend.util.constant import image_dir
 from backend.util.file import get_config
+from backend.util.constant import image_dir, SD_POSITIVE_PROMPT_PREFIX, SD_POSITIVE_PROMPT_SUFFIX, SD_NEGATIVE_PROMPT
 
 
 async def generate_image(prompt: str, seed: int, width: int, height: int, order):
     try:
         url = get_config()['address3']
         payload = {
-            "prompt": prompt + "intricate details, master piece",
-            "negative_prompt": "ng_deepnegative_v1_75t,badhandv4 (worst quality:2),(low quality:2),(normal quality:2),lowres,bad anatomy,normal quality,((monochrome)),((grayscale)),(painting by bad-artist-anime:0.9), (painting by bad-artist:0.9), watermark, text, error, blurry, jpeg artifacts, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, artist name,deformed,distorted,disfigured,doll,poorly drawn,bad anatomy,wrong anatomy,bad hand,bad fingers,NSFW",
+            "prompt": SD_POSITIVE_PROMPT_PREFIX + prompt + SD_POSITIVE_PROMPT_SUFFIX,
+            "negative_prompt": SD_NEGATIVE_PROMPT,
             "sampler_name": "DPM++ 2M",
             "scheduler": "Karras",
+            "scheduler": "Simple",
+            # "forge_additional_modules": [
+            #     "E:\\sd\\FORGE-V2-\\forge\\models\\VAE\\ae.safetensors",
+            #     "E:\\sd\\FORGE-V2-\\forge\\models\\VAE\\clip_l.safetensors",
+            #     "E:\\sd\\FORGE-V2-\\forge\\models\\VAE\\t5xxl_fp16.safetensors",
+            # ],
             "cfg_scale": 7,
             "steps": 25,
             "width": width,
             "height": height,
-            # "override_settings": {
-                # "sd_model_checkpoint":"xl_Dream Anime XL _ 筑梦动漫XL_v4.0 - 余晖缱绻_Dream Anime XL _ 筑梦动漫XL_v4.0 - 余晖缱绻",
-                # "sd_vae": "None",
-            # },
+            "override_settings": {
+                "sd_model_checkpoint":"niji_古风_xl_v1.safetensors",
+                "sd_vae": "None",
+            },
             "seed":-1,
-            "enable_hr": True,
+            "enable_hr": False,
             "hr_scale": 2,
             "denoising_strength": 0.7,
             "hr_upscaler": "R-ESRGAN 4x+",

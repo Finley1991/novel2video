@@ -122,7 +122,7 @@ def read_files_from_directory(dir_path: str) -> List[os.DirEntry]:
     
     return sorted_files
 
-def save_list_to_files(input_list, path, offset):
+def save_list_to_files(lines, directory, offset):
     try:
         for i, line in enumerate(input_list):
             file_path = os.path.join(path, f"{i + offset}.txt")
@@ -139,7 +139,18 @@ def remove_all(directory):
 def make_dir(directory):
     os.makedirs(directory, exist_ok=True)
 
-def read_file(path):
+def save_text_to_file(text_content, file_path):
+    """Saves a single string of text content to a specified file."""
+    try:
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, 'w', encoding='utf-8') as file:
+            file.write(text_content)
+        logging.info(f"Successfully saved text to {file_path}")
+    except Exception as e:
+        logging.error(f"Failed to save text to {file_path}: {e}")
+        raise
+
+def read_file(file_path):
     with open(path, 'r', encoding='utf-8') as file:
         content = file.read()
         return content
