@@ -2,3 +2,6 @@
 /node_modules/
 /front/.next/
 /config.json
+/backend/*/*.pyc
+/backend/*/__pycache__/
+.idea/*

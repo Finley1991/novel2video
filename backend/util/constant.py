@@ -60,3 +60,13 @@ APPEARANCE_PROMPT = """
 """
 LLM_TRANSLATE_MODEL_DEFAULT = "gpt-3.5-turbo"
 LLM_TRANSLATE_TEMPERATURE_DEFAULT = 0.01
+
+import os
+
+# image_dir = os.path.join("temp", "image") # 示例
+# video_dir = os.path.join("temp", "video") # 示例
+
+# 添加 audio_dir 定义
+
+# audio_dir = "temp/audio"
+print("音频存放位置：", audio_dir)

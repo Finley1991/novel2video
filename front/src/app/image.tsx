@@ -12,8 +12,8 @@ export default function AIImageGenerator() {
     const [prompts, setPrompts] = useState<string[]>([]);
     const [loaded, setLoaded] = useState<boolean>(false);
     const [promptsEn, setPromptsEn] = useState<string[]>([]);
-    const [isLoading] = useState<boolean>(false);
-    const [audioPaths, setAudioPaths] = useState<string[]>([]); // 新增状态管理音频路径
+    const [isLoading, setIsLoading] = useState<boolean>(false); // Assuming you might want to use this
+    const [audioPaths, setAudioPaths] = useState<string[]>([]);
 
     useEffect(() => {
         initialize();
@@ -36,19 +36,31 @@ export default function AIImageGenerator() {
                 setPrompts(data.prompts || []);
                 setPromptsEn(data.promptsEn || [])
                 
-                // 初始化 audioPaths 状态
                 const numFragments = data.fragments?.length || 0;
-                let initialAudioUrls = Array(numFragments).fill('');
+                const newAudioPaths = Array(numFragments).fill(''); // Initialize with empty strings
+
                 if (data.audioFiles && Array.isArray(data.audioFiles)) {
-                    initialAudioUrls = data.audioFiles.map((audioPath: string, index: number) => 
-                        audioPath ? addCacheBuster(`http://localhost:8080${audioPath}`) : ''
-                    ).slice(0, numFragments); // Ensure it doesn't exceed fragment length
-                    // Fill remaining if audioFiles is shorter than fragments
-                    for (let i = data.audioFiles.length; i < numFragments; i++) {
-                        initialAudioUrls.push('');
+                    // Map provided audio paths to full URLs, extracting filename if necessary
+                    const processedAudioFileUrls = data.audioFiles.map((audioPath: string | null) => {
+                        if (audioPath) {
+                            // Extract filename from the path (works for OS paths and URL paths)
+                            const filename = audioPath.split(/[\\/]/).pop();
+                            if (filename) {
+                                return addCacheBuster(`http://localhost:8080/temp/audio/${filename}`);
+                            }
+                        }
+                        return ''; // Return empty string if path is null, empty, or filename extraction fails
+                    });
+
+                    // Populate newAudioPaths, ensuring it matches numFragments length
+                    for (let i = 0; i < numFragments; i++) {
+                        if (i < processedAudioFileUrls.length) {
+                            newAudioPaths[i] = processedAudioFileUrls[i];
+                        }
+                        // If i >= processedAudioFileUrls.length, newAudioPaths[i] remains '', which is correct.
                     }
                 }
-                setAudioPaths(initialAudioUrls);
+                setAudioPaths(newAudioPaths);
                 setLoaded(true);
             })
             .catch(error => {
@@ -292,7 +304,12 @@ export default function AIImageGenerator() {
             const data = await response.json(); // data.path 包含音频路径
             const newAudioPaths = [...audioPaths];
             // 确保使用 addCacheBuster 并拼接基础 URL
-            newAudioPaths[index] = addCacheBuster(`http://localhost:8080${data.path}`);
+            const fullPathFromBackend = data.path;
+            const filename = fullPathFromBackend.split(/[\\/]/).pop(); 
+            if (!filename) {
+                throw new Error('Invalid audio file path received from backend');
+            }
+            newAudioPaths[index] = addCacheBuster(`http://localhost:8080/temp/audio/${filename}`);
             setAudioPaths(newAudioPaths);
             showToast(`片段 ${index + 1} 语音生成成功`);
         } catch (error: any) {
@@ -497,14 +514,19 @@ export default function AIImageGenerator() {
                                 />
                                 {/* 音频播放器放置在图片下方 */}
                                 {audioPaths[index] && (
-                                    <audio
-                                        controls
+                                    <div className="mt-2">
+                                        <p className="text-sm font-medium text-gray-700">语音:</p>
+                                        <audio 
+                                        controls 
                                         src={audioPaths[index]}
-                                        key={audioPaths[index]} // Key helps React re-render when src changes
-                                    >
-                                        Your browser does not support the audio element.
-                                    </audio>
-                                )}
+
+                                        className="w-full"
+                                        // preload="metadata" // 可选，有助于加载音频元数据
+                                        >
+                                        你的浏览器不支持播放音频。
+                                        </audio>
+                                    </div>
+                                    )}
                             </div>
                         </div>
                     ))}

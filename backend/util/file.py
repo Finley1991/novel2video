@@ -151,7 +151,7 @@ def save_text_to_file(text_content, file_path):
         raise
 
 def read_file(file_path):
-    with open(path, 'r', encoding='utf-8') as file:
+    with open(file_path, 'r', encoding='utf-8') as file:
         content = file.read()
         return content
 

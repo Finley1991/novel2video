@@ -19,6 +19,7 @@ async def _core_generate_speech_async(text: str, output_path: str, voice: str, r
             voice=voice,
             rate=rate
         )
+        # print("保存声音", output_path)
         await communicate.save(output_path)
         logging.debug(f"Successfully converted text to speech, path: {output_path}")
     except Exception as e:

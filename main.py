@@ -11,7 +11,7 @@ from backend.rest_handler.prompt import extract_scene_from_texts, get_prompts_en
     extract_single_scene_from_text, translate_single_prompt_en
 from backend.rest_handler.video import generate_video, get_video
 from backend.tts.tts import generate_audio_files, generate_single_audio_file
-from backend.util.constant import image_dir, video_dir
+from backend.util.constant import image_dir, video_dir, audio_dir # audio_dir 会被导入为 "temp/audio"
 
 app = Flask(__name__)
 CORS(app)
@@ -151,6 +151,23 @@ def serve_images(filename):
         logging.error(f"File not found: {file_path}")
         return "File not found", 404
     return send_from_directory(image_dir, filename)
+
+# 新增以下路由来提供音频文件服务
+@app.route('/temp/audio/<path:filename>')
+def serve_audio(filename):
+    logging.info(f"Requested audio: {filename}")
+    # 这里的 audio_dir 是从 constant.py 导入的 "temp/audio"
+    file_path = os.path.join(audio_dir, filename) # 这会是 "temp/audio/yourfile.mp3"
+    logging.debug(f"Full audio path: {file_path}")
+    # os.path.exists 会相对于当前工作目录 (CWD) 检查路径
+    # 如果你的 Flask 应用是从项目根目录 (d:\wangyafan\myproject\novel2video) 启动的，
+    # CWD 通常就是项目根目录，所以这个检查是正确的。
+    if not os.path.exists(file_path):
+        logging.error(f"Audio file not found: {file_path}")
+        return "Audio file not found", 404
+    # send_from_directory 会从相对于 app.root_path 的路径提供文件
+    # 如果 audio_dir 是 "temp/audio"，它会从 "app.root_path/temp/audio" 提供文件
+    return send_from_directory(audio_dir, filename)
 
 if __name__ == '__main__':
     logging.info(f"Current working directory:{os.getcwd()}")
