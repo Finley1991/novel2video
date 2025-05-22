@@ -14,21 +14,21 @@ novel_path = "D:/wangyafan/myproject/novel2video/novel.txt"
 prompt_path = "D:/wangyafan/myproject/novel2video/prompt.txt"
 config_path = "D:/wangyafan/myproject/novel2video/config.json"
 
-IMAGE_WIDTH = 1024
-IMAGE_HEIGHT = 768
+IMAGE_WIDTH = 1280
+IMAGE_HEIGHT = 960
 
 # Prompt related constants
 FRAGMENTS_PER_LLM_CALL = 30
 
 # Stable Diffusion Prompts
-SD_POSITIVE_PROMPT_PREFIX = "ancient chinese, niji style,"
-SD_POSITIVE_PROMPT_SUFFIX = "intricate details, masterpiece"
+SD_POSITIVE_PROMPT_PREFIX = "masterpiece, niji ancient, bright color,"
+SD_POSITIVE_PROMPT_SUFFIX = ""
 SD_NEGATIVE_PROMPT = "ng_deepnegative_v1_75t,badhandv4 (worst quality:2),(low quality:2),(normal quality:2),lowres,bad anatomy,normal quality,((monochrome)),((grayscale)),(painting by bad-artist-anime:0.9), (painting by bad-artist:0.9), watermark, text, error, blurry, jpeg artifacts, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, artist name,deformed,distorted,disfigured,doll,poorly drawn,bad anatomy,wrong anatomy,bad hand,bad fingers,NSFW"
 
 # LLM related constants
 LLM_MODEL_SILICONFLOW = "siliconflow"
 LLM_MODEL_SAMBANOVA = "sambanova"
-LLM_TRANSLATE_SYS_PROMPT = "把输入的中文描述转换成stable diffusion提示词, 中文翻译成英文, 英文逗号分隔"
+LLM_TRANSLATE_SYS_PROMPT = "把输入的中文描述转换成stable diffusion提示词, 中文翻译成英文, 英文逗号分隔, 禁止输出其他"
 LLM_TRANSLATE_MODEL_DEFAULT = "gpt-3.5-turbo"
 LLM_TRANSLATE_TEMPERATURE_DEFAULT = 0.01
 

@@ -124,11 +124,13 @@ def read_files_from_directory(dir_path: str) -> List[os.DirEntry]:
 
 def save_list_to_files(lines, directory, offset):
     try:
-        for i, line in enumerate(input_list):
-            file_path = os.path.join(path, f"{i + offset}.txt")
+        # print("directory is ", directory)
+        for i, line in enumerate(lines):
+            file_path = os.path.join(directory, f"{i + offset}.txt")
             with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(line)
     except Exception as e:
+        print(f"Error saving lines to files: {e}")
         return e
     return None
 

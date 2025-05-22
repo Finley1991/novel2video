@@ -58,6 +58,7 @@ def extract_scene_from_texts():
         offset += len(t2i_prompts)
         try:
             logging.info(f"len is {len(t2i_prompts)}")
+            # print("prompts_dir ", prompts_dir)
             save_list_to_files(t2i_prompts, prompts_dir, offset - len(t2i_prompts))
         except Exception as e:
             return jsonify({"error": "save list to file failed"}), 500
@@ -96,6 +97,8 @@ def get_prompts_en():
             for key, value in character_map.items():
                 if key in line:
                     lines[i] = lines[i].replace(key, value)
+                    break
+        # print("character map is ", character_map)
     except Exception as e:
         logging.error(f"translate prompts failed, err {e}")
         return jsonify({"error": "translate failed"}), 500
@@ -195,8 +198,25 @@ def translate_single_prompt_en():
     index = req_data['index']
 
     try:
+        character_map = {}
+        p = os.path.join(character_dir, 'characters.txt')
+        if os.path.exists(p):
+            with open(p, 'r', encoding='utf8') as file:
+                    character_map = json.load(file)
+        
+    except Exception as e:
+        logging.error(f"translate prompts failed, err {e}")
+        return jsonify({"error": "translate failed"}), 500
+
+    try:
         # 翻译中文 prompt 到英文
+        for key, value in character_map.items():
+            if key in chinese_prompt:
+                chinese_prompt = chinese_prompt.replace(key, value)
+                # 只替换第一个匹配项，避免重复替换
+                break
         english_prompt = llm_translate(chinese_prompt)
+
 
         # 保存翻译后的英文 prompt
         file_path = os.path.join(prompts_en_dir, f"{index}.txt")

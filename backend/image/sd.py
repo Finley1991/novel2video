@@ -17,7 +17,7 @@ async def generate_image(prompt: str, seed: int, width: int, height: int, order)
             "negative_prompt": SD_NEGATIVE_PROMPT,
             "sampler_name": "DPM++ 2M",
             "scheduler": "Karras",
-            "scheduler": "Simple",
+            # "scheduler": "Simple",
             # "forge_additional_modules": [
             #     "E:\\sd\\FORGE-V2-\\forge\\models\\VAE\\ae.safetensors",
             #     "E:\\sd\\FORGE-V2-\\forge\\models\\VAE\\clip_l.safetensors",
@@ -27,11 +27,11 @@ async def generate_image(prompt: str, seed: int, width: int, height: int, order)
             "steps": 25,
             "width": width,
             "height": height,
-            "override_settings": {
-                "sd_model_checkpoint":"niji_古风_xl_v1.safetensors",
-                "sd_vae": "None",
-            },
-            "seed":-1,
+            # "override_settings": {
+            #     "sd_model_checkpoint":"niji_古风_xl_v1.safetensors",
+            #     "sd_vae": "None",
+            # },
+            "seed": -1,
             "enable_hr": False,
             "hr_scale": 2,
             "denoising_strength": 0.7,

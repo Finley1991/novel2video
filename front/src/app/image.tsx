@@ -6,6 +6,38 @@ import {showToast} from "@/app/toast";
 import {ToastContainer, toast } from 'react-toastify'; // 确保导入 toast
 import 'react-toastify/dist/ReactToastify.css'; // 确保导入 toastify CSS
 
+// 按钮基础样式（可提取到组件顶部常量）
+const buttonBaseStyle = {
+    padding: '0.5rem 1rem',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontSize: '0.9rem',
+    transition: 'all 0.2s ease',
+    display: 'flex',
+    alignItems: 'center'
+};
+
+// 主按钮样式（重要操作）
+const buttonPrimaryStyle = {
+    backgroundColor: '#2563eb',
+    color: 'white',
+    boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)'
+};
+
+// 次按钮样式（辅助操作）
+const buttonSecondaryStyle = {
+    backgroundColor: '#f3f4f6',
+    color: '#111827'
+};
+
+// 轮廓按钮样式（刷新等轻操作）
+const buttonOutlineStyle = {
+    backgroundColor: 'transparent',
+    color: '#2563eb',
+    border: '1px solid #e5e7eb'
+};
+
 export default function AIImageGenerator() {
     const [images, setImages] = useState<string[]>([]);
     const [fragments, setFragments] = useState<string[]>([]);
@@ -437,23 +469,77 @@ export default function AIImageGenerator() {
 
     return (
         <div className="container">
-            <div className="header">
-                <h1>AI Image Generator</h1>
+            {/* 优化后的顶部功能栏 */}
+            <div className="header" style={{
+                backgroundColor: '#f8f9fa',
+                borderBottom: '1px solid #e9ecef',
+                padding: '1rem 1.5rem',
+                marginBottom: '1.5rem',
+                borderRadius: '8px'
+            }}>
+                <div className="button-container" style={{
+                    display: 'flex',
+                    gap: '0.75rem',
+                    flexWrap: 'wrap',
+                    maxWidth: '1200px',
+                    margin: '0 auto'
+                }}>
+                    {/* 基础按钮样式 */}
+                    <button 
+                        onClick={extractChapterFragments}
+                        style={{...buttonBaseStyle, ...buttonPrimaryStyle}}
+                        className="primary-btn"
+                    >
+                        分块
+                    </button>
+                    
+                    {loaded && (
+                        <>
+                            <button 
+                                onClick={extractPrompts} 
+                                className="extract-prompts-button"
+                                style={{...buttonBaseStyle, ...buttonPrimaryStyle}}
+                            >
+                                一键分镜
+                            </button>
+                            
+                            <button 
+                                onClick={generatePromptsEn} 
+                                className="generate-promptsEn" 
+                                disabled={isLoading}
+                                style={{...buttonBaseStyle, ...buttonPrimaryStyle}}
+                            >
+                                {isLoading ? 'Generating...' : '一键翻译'}
+                            </button>
+                            
+                            <button 
+                                onClick={generateAllImages} 
+                                className="generate-all"
+                                style={{...buttonBaseStyle, ...buttonPrimaryStyle}}
+                            >
+                                一键作图
+                            </button>
+                            
+                            <button 
+                                onClick={initialize} 
+                                className="refresh-images"
+                                style={{...buttonBaseStyle, ...buttonOutlineStyle}}
+                            >
+                                刷新
+                            </button>
+                            
+                            <button 
+                                onClick={generateAudio} 
+                                className="generate-audio"
+                                style={{...buttonBaseStyle, ...buttonPrimaryStyle}}
+                            >
+                                一键音频
+                            </button>
+                        </>
+                    )}
+                </div>
             </div>
-            <div className="button-container">
-                <button onClick={extractChapterFragments}>分割章节</button>
-                {loaded && (
-                    <>
-                        <button onClick={extractPrompts} className="extract-prompts-button">提取中文prompts</button>
-                        <button onClick={generatePromptsEn} className="generate-promptsEn" disabled={isLoading}>
-                            {isLoading ? 'Generating...' : '翻译成英文'}
-                        </button>
-                        <button onClick={generateAllImages} className="generate-all">一键生成</button>
-                        <button onClick={initialize} className="refresh-images">刷新</button>
-                        <button onClick={generateAudio} className="generate-audio">生成音频</button>
-                    </>
-                )}
-            </div>
+            
             {loaded && (
                 <>
                     {fragments.map((line, index) => (
@@ -462,14 +548,14 @@ export default function AIImageGenerator() {
                                 <textarea value={line} readOnly rows={4} className="scrollable"></textarea>
                                 <div className="button-group">
                                     {index !== 0 && (
-                                        <button className="merge-button" onClick={() => mergeFragments(index, 'up')}>Merge Up</button>
+                                        <button className="merge-button" onClick={() => mergeFragments(index, 'up')}>向上合并</button>
                                     )}
                                     {index !== fragments.length - 1 && (
-                                        <button className="merge-button" onClick={() => mergeFragments(index, 'down')}>Merge Down</button>
+                                        <button className="merge-button" onClick={() => mergeFragments(index, 'down')}>向下合并</button>
                                     )}
-                                    <button onClick={() => generateSinglePromptZh(index, line)} style={{marginTop: '5px'}}>生成中文Prompt</button>
+                                    <button onClick={() => generateSinglePromptZh(index, line)} style={{marginTop: '5px'}}>分镜</button>
                                     {/* "生成语音(片段)" 按钮位置保持在 input-section 内，使其与片段内容关联更紧密 */}
-                                    <button onClick={() => generateSingleAudio(index, line)} style={{marginTop: '5px'}}>生成语音(片段)</button>
+                                    <button onClick={() => generateSingleAudio(index, line)} style={{marginTop: '5px'}}>语音</button>
                                 </div>
                             </div>
                             <div className="prompt-section">
@@ -484,10 +570,10 @@ export default function AIImageGenerator() {
                                     rows={4}
                                     className="scrollable"
                                 ></textarea>
-                                <button onClick={() => savePromptZh(index)}>保存中文Prompt</button>
-                                <button onClick={() => translateSinglePromptEn(index, prompts[index])} style={{marginLeft: '5px'}}>翻译成英文</button>
+                                <button onClick={() => savePromptZh(index)}>分镜保存</button>
+                                <button onClick={() => translateSinglePromptEn(index, prompts[index])} style={{marginLeft: '5px'}}>绘图提示词</button>
                                 {/* "生成语音(中文Prompt)" 按钮位置保持在 prompt-section 内，使其与中文Prompt内容关联更紧密 */}
-                                <button onClick={() => generateSingleAudio(index, prompts[index])} style={{marginTop: '5px'}}>生成语音(中文Prompt)</button>
+                                {/* <button onClick={() => generateSingleAudio(index, prompts[index])} style={{marginTop: '5px'}}>生成语音(中文Prompt)</button> */}
                             </div>
                             <div className="promptEn-section">
                                 <textarea
@@ -501,8 +587,8 @@ export default function AIImageGenerator() {
                                     rows={4}
                                     className="scrollable"
                                 ></textarea>
-                                <button onClick={() => savePromptEn(index)}>保存英文Prompt</button>
-                                <button onClick={() => generateSingleImage(index)}>重新生成图片</button>
+                                <button onClick={() => savePromptEn(index)}>提示词保存</button>
+                                <button onClick={() => generateSingleImage(index)}>图片</button>
                             </div>
                             <div className="image-section">
                                 <Image

@@ -25,3 +25,89 @@ body {
     text-wrap: balance;
   }
 }
+
+/* 在你的全局 CSS 文件中 */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: white; /* 或者你选择的颜色 */
+  /* 可能还需要添加一些 padding 或其他样式来美化 */
+}
+/* 继续补充样式 */
+.card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.input-section {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.scrollable {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 14px;
+    resize: vertical;
+}
+
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.merge-button {
+    padding: 6px 12px;
+    background-color: #2196F3;
+}
+
+.merge-button:hover {
+    background-color: #1976D2;
+}
+
+/* 继续补充样式 */
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.input-section {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.scrollable {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.merge-button {
+  padding: 6px 12px;
+  background-color: #2196F3;
+}
+
+.merge-button:hover {
+  background-color: #1976D2;
+}
